@@ -136,7 +136,7 @@ app.use("/api/leads", leadRoutes);
 app.get("/", (req, res) => {
   res.json({
     success: true,
-    message: "Startup CRM Backend is Running 🚀",
+    message: "Startup CRM Backend is Running 🚀 - Version 1.0.1",
   });
 });
 
