@@ -25,7 +25,10 @@ async function seed() {
       });
       console.log("👤 User registered successfully!");
     } else {
-      console.log(`👤 User '${email}' already exists.`);
+      console.log(`👤 User '${email}' already exists. Resetting password to default...`);
+      user.password = password;
+      await user.save();
+      console.log("👤 User password reset successfully!");
     }
 
     // 2. Clear existing leads for this user to start fresh

@@ -53,6 +53,8 @@ if (process.env.NODE_ENV === "production") {
 // 3. CORS configuration with dynamic checking for production and local environments
 const allowedOrigins = [
   process.env.FRONTEND_URL,
+  "https://startup-crm-lite-is4gpmtsz-navyasreethatigutla-7037s-projects.vercel.app",
+  "https://startup-crm-lite-navyasreethatigutla-7037s-projects.vercel.app",
   "https://your-app.vercel.app",
   "http://localhost:5173" // Fallback local development port
 ].filter(Boolean); // Clean any undefined values
@@ -62,11 +64,13 @@ app.use(
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps, curl, or server-to-server requests)
       // Also allow any localhost/127.0.0.1 port in development/local environments
+      // Also allow Vercel previews and deployments
       if (
         !origin ||
         allowedOrigins.includes(origin) ||
         origin.startsWith("http://localhost:") ||
-        origin.startsWith("http://127.0.0.1:")
+        origin.startsWith("http://127.0.0.1:") ||
+        origin.endsWith(".vercel.app")
       ) {
         callback(null, true);
       } else {
