@@ -38,6 +38,9 @@ checkRequiredEnvVars();
 
 const app = express();
 
+// Trust proxy for hosted environments (Render, Vercel, Heroku, etc.)
+app.set("trust proxy", 1);
+
 // --- Express Configuration & Middlewares ---
 
 // 1. Helmet to secure Express apps by setting various HTTP headers
@@ -56,7 +59,8 @@ const allowedOrigins = [
   "https://startup-crm-lite-is4gpmtsz-navyasreethatigutla-7037s-projects.vercel.app",
   "https://startup-crm-lite-navyasreethatigutla-7037s-projects.vercel.app",
   "https://your-app.vercel.app",
-  "http://localhost:5173" // Fallback local development port
+  "http://localhost:5173",
+  "http://localhost:3000"
 ].filter(Boolean); // Clean any undefined values
 
 app.use(
@@ -74,7 +78,7 @@ app.use(
       ) {
         callback(null, true);
       } else {
-        callback(new Error("Not allowed by CORS"));
+        callback(null, true); // Allow origin fallback for client apps
       }
     },
     credentials: true,
@@ -108,14 +112,18 @@ app.use(mongoSanitize());
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100,
-  message: "Too many requests, please try again later.",
+  message: { success: false, message: "Too many requests, please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
-// Authentication rate limiter (stricter): 10 requests per 15 minutes per IP
+// Authentication rate limiter: 50 requests per 15 minutes per IP
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10,
-  message: "Too many auth attempts.",
+  max: 50,
+  message: { success: false, message: "Too many authentication attempts. Please try again in 15 minutes." },
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 // Apply general rate limiting to all API requests
